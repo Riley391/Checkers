@@ -1,1 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkers Game</title>
+  <style>
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, 50px);
+      grid-template-rows: repeat(8, 50px);
+    }
 
+    .square {
+      width: 50px;
+      height: 50px;
+      background-color: #eee;
+      border: 1px solid #999;
+      position: relative;
+    }
+
+    .black {
+      background-color: #000;
+    }
+
+    .piece {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: red;
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      cursor: pointer;
+    }
+
+    .king {
+      background-color: gold;
+    }
+  </style>
+</head>
+<body>
+  <div class="board" id="board"></div>
+
+  <script>
+    const board = document.getElementById('board');
+    let selectedPiece = null;
+
+    function createBoard() {
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const square = document.createElement('div');
+          square.className = 'square';
+          if ((row + col) % 2 === 1) {
+            square.classList.add('black');
+          }
+          square.dataset.row = row;
+          square.dataset.col = col;
+          square.addEventListener('click', squareClicked);
+          board.appendChild(square);
+        }
+      }
+    }
+
+    function createPiece(row, col, isKing) {
+      const piece = document.createElement('div');
+      piece.className = 'piece';
+      if (isKing) {
+        piece.classList.add('king');
+      }
+      piece.dataset.row = row;
+      piece.dataset.col = col;
+      piece.addEventListener('click', pieceClicked);
+      return piece;
+    }
+
+    function squareClicked(event) {
+      const square = event.target;
+      const row = parseInt(square.dataset.row);
+      const col = parseInt(square.dataset.col);
+      if (selectedPiece) {
+        // Move the selected piece to the clicked square
+        movePiece(selectedPiece, row, col);
+        selectedPiece = null;
+      }
+    }
+
+    function pieceClicked(event) {
+      const piece = event.target;
+      selectedPiece = piece;
+    }
+
+    function movePiece(piece, row, col) {
+      // Move the piece to the new position
+      piece.dataset.row = row;
+      piece.dataset.col = col;
+      piece.style.top = `${row * 50 + 5}px`;
+      piece.style.left = `${col * 50 + 5}px`;
+
+      // Check for capturing opponent piece
+      const opponentPiece = document.querySelector(`.piece[data-row="${row}"][data-col="${col}"]:not(.${piece.classList.value})`);
+      if (opponentPiece) {
+        // Remove the captured piece from the board
+        opponentPiece.remove();
+      }
+
+      // Check if the piece should be kinged
+      if (row === 0 && !piece.classList.contains('king')) {
+        piece.classList.add('king');
+      }
+    }
+
+    function initializePieces() {
+      // Add pieces to the board
+      for (let row = 0; row < 3; row++) {
+        for (let col = 0; col < 8; col++) {
+          if ((row + col) % 2 === 1) {
+            const piece = createPiece(row, col, false);
+            board.appendChild(piece);
+          }
+        }
+      }
+      for (let row = 5; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          if ((row + col) % 2 === 1) {
+            const piece = createPiece(row, col, false);
+            board.appendChild(piece);
+          }
+        }
+      }
+    }
+
+    createBoard();
+    initializePieces();
+  </script>
+</body>
+</html>
